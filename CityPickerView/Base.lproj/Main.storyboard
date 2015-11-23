@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CityPickerView" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gIP-bQ-wdZ">
+                                <rect key="frame" x="230" y="182" width="140" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <view alpha="0.29999999999999999" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HgK-b0-odQ">
+                                <rect key="frame" x="50" y="99" width="442" height="60"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QkK-f7-WjT" customClass="CityPickerView" customModule="CityPickerView" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="321" width="600" height="279"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="HgK-b0-odQ" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="3Fc-rs-kpq"/>
+                            <constraint firstItem="HgK-b0-odQ" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="Guy-wl-b2M"/>
+                            <constraint firstItem="HgK-b0-odQ" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="hDz-1t-lvH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="HgK-b0-odQ" secondAttribute="trailing" id="pjO-x9-eT9"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="backView" destination="HgK-b0-odQ" id="WyS-11-OQg"/>
+                        <outlet property="cityPickerView" destination="QkK-f7-WjT" id="2at-2Y-1MB"/>
+                        <outlet property="cityTextField" destination="gIP-bQ-wdZ" id="fWR-eS-x2d"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="326" y="441"/>
+        </scene>
+    </scenes>
+</document>
