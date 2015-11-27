@@ -10,8 +10,10 @@ import UIKit
 import Foundation
 
 protocol CityPickerViewDelegate: NSObjectProtocol {
-    func cityPickerViewDidPickArea(cityPickerView: CityPickerView, area: String)
-    func hiddenPicker(cityPickerView: CityPickerView)
+    
+    func cityPickerDidPickArea(cityPickerView: CityPickerView, province: String!, city: String!, district: String!)
+    func cityPickerDidCancel(cityPickerView: CityPickerView)
+    
 }
 
 class CityPickerView: UIView {
@@ -27,7 +29,7 @@ class CityPickerView: UIView {
     
     // properties
     var cities:NSArray?
-    var areas:NSArray?
+    var districts:NSArray?
     var provinces:NSArray?
     var cityData:NSArray = [] {
         didSet{
@@ -35,7 +37,7 @@ class CityPickerView: UIView {
         }
     }
     
-    var pickerArea: String?
+    var pickerDistrict: String?
     var pickerCity: String?
     var pickerState: String?
     
@@ -66,9 +68,9 @@ class CityPickerView: UIView {
         self.view = loadViewFromNib()
         view.frame = self.bounds
 //        //MARK:自动调整大小
-//        view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+        view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
 //        //MARK:添加约束
-//        view.addConstraints(self.constraints)
+        view.addConstraints(self.constraints)
         self.addSubview(self.view)
         //MARK:添加手势
         let tapGR = UITapGestureRecognizer(target: self, action: "tapAction:")
@@ -106,7 +108,7 @@ class CityPickerView: UIView {
       self.buttonBgView.hidden = false
     }
     @IBAction func cancleAction(sender: AnyObject) {
-        self.delegate?.hiddenPicker(self)
+        self.delegate?.cityPickerDidCancel(self)
        
     }
     
@@ -120,16 +122,15 @@ class CityPickerView: UIView {
         //区
         let district: String = self.getDistrict()
         
-        if let area:String = "\(province)\(city)\(district)" {
-            self.delegate?.cityPickerViewDidPickArea(self, area: area)
-        }
+        
+        self.delegate?.cityPickerDidPickArea(self, province: province, city: city, district: district)
         
     }
     
     private func getCityData() {
         self.provinces = NSMutableArray(contentsOfFile: NSBundle.mainBundle().pathForResource("area", ofType: "plist")!)!
         self.cities = self.provinces!.objectAtIndex(0).objectForKey("cities") as? NSArray
-        areas = cities?.objectAtIndex(0).objectForKey("areas") as? NSArray
+        self.districts = cities?.objectAtIndex(0).objectForKey("areas") as? NSArray
     }
     
 }
@@ -148,7 +149,7 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         case 1:
             return (self.cities != nil ? self.cities!.count : 0)
         case 2:
-            return (self.areas != nil ? self.areas!.count : 0)
+            return (self.districts != nil ? self.districts!.count : 0)
         default:
             return 0
         }
@@ -164,8 +165,8 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         case 1:
             return cities?.objectAtIndex(row).objectForKey("city") as? String
         case 2:
-            if (areas?.count > 0) {
-                return areas?.objectAtIndex(row) as? String
+            if (self.districts?.count > 0) {
+                return self.districts?.objectAtIndex(row) as? String
             }
         default:
             return ""
@@ -185,14 +186,14 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
             self.pickerView.selectRow(0, inComponent: 1, animated: true)
             self.pickerView.reloadComponent(1)
             
-            areas = cities?.objectAtIndex(0).objectForKey("areas") as? NSArray
+            self.districts = cities?.objectAtIndex(0).objectForKey("areas") as? NSArray
             
             // reselect 1st area
             self.pickerView.selectRow(0, inComponent: 2, animated: true)
             self.pickerView.reloadComponent(2)
             
-                  case 1:
-            areas = cities?.objectAtIndex(row).objectForKey("areas") as? NSArray
+        case 1:
+            self.districts = cities?.objectAtIndex(row).objectForKey("areas") as? NSArray
             
             // reselect 1st area
             self.pickerView.selectRow(0, inComponent: 2, animated: true)
@@ -216,12 +217,12 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         let p2 = self.pickerView.selectedRowInComponent(1)
         self.pickerCity = self.cities?.objectAtIndex(p2).objectForKey("city") as? String
         
-        if (self.areas?.count > 0) {
+        if (self.districts?.count > 0) {
             let p3 = self.pickerView.selectedRowInComponent(2)
-            self.pickerArea = self.areas?.objectAtIndex(p3) as? String
+            self.pickerDistrict = self.districts?.objectAtIndex(p3) as? String
             
         } else {
-            self.pickerArea = ""
+            self.pickerDistrict = ""
         }
         
     }
@@ -229,7 +230,7 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
     
     //省
     func getProvince() -> String {
-        if self.pickerState?.characters.count > 0 && self.areas?.count > 0 {
+        if self.pickerState?.characters.count > 0 && self.districts?.count > 0 {
             return "\(self.pickerState!)省"
         } else if self.pickerState?.characters.count > 0 {
             return "\(self.pickerState!)市"
@@ -238,7 +239,7 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
     }
     //市
     func getCity() -> String {
-        if self.pickerState?.characters.count > 0 && self.pickerCity?.characters.count > 0 && self.areas?.count > 0 {
+        if self.pickerState?.characters.count > 0 && self.pickerCity?.characters.count > 0 && self.districts?.count > 0 {
             return "\(self.pickerCity!)市"
         } else if self.pickerCity?.characters.count > 0 {
             return "\(self.pickerCity!)区"
@@ -247,8 +248,8 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
     }
     //区
     func getDistrict() ->String {
-        if self.pickerArea?.characters.count > 0 {
-            return "\(self.pickerArea!)"
+        if self.pickerDistrict?.characters.count > 0 {
+            return "\(self.pickerDistrict!)"
         }
         return ""
     }

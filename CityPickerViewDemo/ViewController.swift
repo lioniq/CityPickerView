@@ -28,8 +28,6 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         
     }
-    
-
 }
 
 extension ViewController: UITextFieldDelegate {
@@ -45,14 +43,14 @@ extension ViewController: UITextFieldDelegate {
 
 extension ViewController:CityPickerViewDelegate {
     
-    func cityPickerViewDidPickArea(cityPickerView: CityPickerView, area: String) {
-        self.cityPickerView = cityPickerView
-        self.cityTextField.text = area
+    func cityPickerDidPickArea(cityPickerView: CityPickerView, province: String!, city: String!, district: String!) {
+        let provinceCityDistrict = "\(province)\(city)\(district)"
+        self.cityTextField.text = provinceCityDistrict
+        
         self.cityPickerView.hidden = true
     }
     
-    func hiddenPicker(cityPickerView: CityPickerView) {
-        self.cityPickerView = cityPickerView
+    func cityPickerDidCancel(cityPickerView: CityPickerView) {
         self.cityPickerView.hidden = true
     }
 }
