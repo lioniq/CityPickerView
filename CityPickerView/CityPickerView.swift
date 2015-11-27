@@ -11,6 +11,7 @@ import Foundation
 
 protocol CityPickerViewDelegate: NSObjectProtocol {
     func cityPickerViewDidPickArea(cityPickerView: CityPickerView, area: String)
+    func hiddenPicker(cityPickerView: CityPickerView)
 }
 
 class CityPickerView: UIView {
@@ -18,6 +19,7 @@ class CityPickerView: UIView {
     @IBOutlet weak var sureButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var pickerView: UIPickerView!
+    @IBOutlet weak var buttonBgView: UIView!
     
     //load nib/xib
     var view: UIView!
@@ -68,16 +70,18 @@ class CityPickerView: UIView {
 //        //MARK:添加约束
 //        view.addConstraints(self.constraints)
         self.addSubview(self.view)
+        //MARK:添加手势
+        let tapGR = UITapGestureRecognizer(target: self, action: "tapAction:")
+        self.view.addGestureRecognizer(tapGR)
         
+        self.pickerView?.delegate = self
+        self.pickerView?.dataSource = self
+        self.buttonBgView.hidden = true
         self.pickerView.selectRow(0, inComponent: 0, animated: false)
         self.pickerView.selectRow(0, inComponent: 1, animated: false)
         self.pickerView.selectRow(0, inComponent: 2, animated: false)
         self.pickerView.reloadAllComponents()
-        
-        self.pickerView?.delegate = self
-        self.pickerView?.dataSource = self
-        self.sureButton.hidden = true
-        self.cancelButton.hidden = true
+
         addAnimation()
         getCityData()
     }
@@ -85,30 +89,41 @@ class CityPickerView: UIView {
     //MARK:添加动画
     private func addAnimation() {
         UIView.beginAnimations(nil, context: nil)
-        UIView.setAnimationDuration(20)
+        UIView.setAnimationDuration(1)
         self.pickerView.frame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height - 200)
         UIView.setAnimationDelegate(self)
         UIView.setAnimationDidStopSelector("showButton:")
         UIView.commitAnimations()
     }
     
-    //MARK:动画结束之后显示button
+    //MARK:手势响应事件
+    func tapAction(tap: UITapGestureRecognizer) {
+        tap.view?.hidden = true
+    }
+    
+    //MARK:动画结束之后显示buttonBgView
     func showButton(event:UIEvent) {
-        self.sureButton.hidden = false
-        self.cancelButton.hidden = false
+      self.buttonBgView.hidden = false
     }
     @IBAction func cancleAction(sender: AnyObject) {
-        self.view.hidden = true
+        self.delegate?.hiddenPicker(self)
+       
     }
     
     @IBAction func sureAction(sender: AnyObject) {
         
         //MARK:传值
-        if let area:String = self.pickerValueString() {
+        //省
+        let province: String = self.getProvince()
+        //市
+        let city: String = self.getCity()
+        //区
+        let district: String = self.getDistrict()
+        
+        if let area:String = "\(province)\(city)\(district)" {
             self.delegate?.cityPickerViewDidPickArea(self, area: area)
         }
         
-        self.view.hidden = true
     }
     
     private func getCityData() {
@@ -122,7 +137,7 @@ class CityPickerView: UIView {
 extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
     
     func numberOfComponentsInPickerView( pickerView: UIPickerView) -> Int{
-        return 5
+        return 3
     }
     
     //设置选择框的行数
@@ -158,13 +173,6 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         return nil
     }
     
-//    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
-//        let screenWidth = UIScreen.mainScreen().bounds.width
-//        let widthForComponent = screenWidth / 3
-//        return widthForComponent
-//    }
-    
-    
     //选项的选择状态
     func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
@@ -196,7 +204,7 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         }
         
         self.getPickerValues()
-        print("value = \(self.pickerValueString())")
+      
         
     }
     
@@ -218,10 +226,31 @@ extension CityPickerView: UIPickerViewDelegate,UIPickerViewDataSource{
         
     }
     
-    func pickerValueString() -> String {
-        if (self.pickerState?.characters.count > 0 || self.pickerCity?.characters.count > 0 || self.pickerArea?.characters.count > 0) {
-            return "\(self.pickerState!)\(self.pickerCity!)\(self.pickerArea!)"
+    
+    //省
+    func getProvince() -> String {
+        if self.pickerState?.characters.count > 0 && self.areas?.count > 0 {
+            return "\(self.pickerState!)省"
+        } else if self.pickerState?.characters.count > 0 {
+            return "\(self.pickerState!)市"
         }
         return ""
     }
+    //市
+    func getCity() -> String {
+        if self.pickerState?.characters.count > 0 && self.pickerCity?.characters.count > 0 && self.areas?.count > 0 {
+            return "\(self.pickerCity!)市"
+        } else if self.pickerCity?.characters.count > 0 {
+            return "\(self.pickerCity!)区"
+        }
+        return ""
+    }
+    //区
+    func getDistrict() ->String {
+        if self.pickerArea?.characters.count > 0 {
+            return "\(self.pickerArea!)"
+        }
+        return ""
+    }
+
 }
